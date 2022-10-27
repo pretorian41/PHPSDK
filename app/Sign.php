@@ -5,7 +5,7 @@ namespace UPC;
 class Sign
 {
 
-    public static function paymentSign($params, $privateKeyPath = "")
+    public static function paymentSign($params, $privateKeyPath = "", bool $isFile = true)
     {
         $MerchantID = $params['MerchantID'];
         $TerminalID = $params['TerminalID'];
@@ -15,11 +15,11 @@ class Sign
         $TotalAmount = $params['TotalAmount'];
 
         $str = "$MerchantID;$TerminalID;$PurchaseTime;$OrderID;$CurrencyID;$TotalAmount;;";
-        return self::makeSign($str, $privateKeyPath);
+        return self::makeSign($str, $privateKeyPath, $isFile);
     }
 
 
-    public static function recurrentPaymentSign($params, $privateKeyPath = "")
+    public static function recurrentPaymentSign($params, $privateKeyPath = "", bool $isFile = true)
     {
         $MerchantID = $params['MerchantID'];
         $TerminalID = $params['TerminalID'];
@@ -31,11 +31,11 @@ class Sign
 
 
         $str = "$MerchantID;$TerminalID;$PurchaseTime;$OrderID;$CurrencyID;$TotalAmount;$SessionData;true;";
-        return self::makeSign($str, $privateKeyPath);
+        return self::makeSign($str, $privateKeyPath, $isFile);
     }
 
 
-    public static function reversalPaymentSign($params, $privateKeyPath = "")
+    public static function reversalPaymentSign($params, $privateKeyPath = "", bool $isFile = true)
     {
         $MerchantID = $params['MerchantID'];
         $TerminalID = $params['TerminalID'];
@@ -58,11 +58,11 @@ class Sign
         } else {
             $str = "$MerchantID;$TerminalID;$PurchaseTime;$OrderID;$CurrencyID;$TotalAmount;$SessionData;$ApprovalCode;$RRN;";
         }
-        return self::makeSign($str, $privateKeyPath);
+        return self::makeSign($str, $privateKeyPath, $isFile);
     }
 
 
-    public static function preAuthorizationSign($params, $privateKeyPath = "")
+    public static function preAuthorizationSign($params, $privateKeyPath = "", bool $isFile = true)
     {
         $MerchantID = $params['MerchantID'];
         $TerminalID = $params['TerminalID'];
@@ -73,13 +73,13 @@ class Sign
         $SessionData = $params['SessionData'];
 
         $str = "$MerchantID;$TerminalID;$PurchaseTime;$OrderID;$CurrencyID;$TotalAmount;$SessionData;";
-        return self::makeSign($str, $privateKeyPath);
+        return self::makeSign($str, $privateKeyPath, $isFile);
     }
 
 
-    public static function makeSign($formated_string, $privateKeyPath)
+    public static function makeSign($formated_string, $privateKeyPath, bool $isFile = true)
     {
-        openssl_sign($formated_string, $signature, file_get_contents($privateKeyPath));
+        openssl_sign($formated_string, $signature, $isFile ? file_get_contents($privateKeyPath): $privateKeyPath);
 
         return base64_encode($signature);
     }
