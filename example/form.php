@@ -11,7 +11,6 @@
 <body>
 
     <?php
-    require __DIR__ . '/../app/sdk.php';
 
     use UPC\UpcSDK;
     use UPC\UpcPaymentData;
