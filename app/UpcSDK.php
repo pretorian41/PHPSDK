@@ -13,6 +13,7 @@ class UpcSDK implements UpcInterface
 
     public function __construct(
         $private_key_path,
+        private string $baseUrl,
         private bool $isFile = true
     )
     {
@@ -45,6 +46,25 @@ class UpcSDK implements UpcInterface
         return null;
     }
 
+    public function doPaymentCall(UpcPaymentData $data, string $url= "")
+    {
+//        $jws_arr =  explode('.', $this->PaymentJWS($data));
+//        $payload = [
+//            'header' => $jws_arr[0],
+//            'payload' => $jws_arr[1],
+//            'Signature' => $jws_arr[2],
+//        ];
+
+        $response = HttpClient::postJSON("https://$this->baseUrl$url", json_encode($data));
+        if($response){
+            dump($response);
+            $parsed_response = json_decode($response);
+            $result = json_decode(base64_decode($parsed_response->payload));
+            return $result;
+        }
+        return null;
+    }
+
     public function reversal($params, string $url= "secure.upc.ua"){
         $signature = Sign::reversalPaymentSign($params, $this->private_key, $this->isFile);
 
@@ -65,7 +85,7 @@ class UpcSDK implements UpcInterface
 
         $jws = new JWS();
         $private_key = $this->isFile ? file_get_contents($this->private_key): $this->private_key;
-        $jws_string = $jws->encode($headers, $payload, $private_key);
-        return $jws_string;
+
+        return $jws->encode($headers, $payload, $private_key);
     }
 }
